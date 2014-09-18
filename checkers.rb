@@ -22,9 +22,11 @@ class Checkers
     board.draw
 
     until board.over?
+      board.draw
       player = @players[@color]
 
       piece = get_piece(player)
+      board.draw(piece.square)
       move_piece(piece, player)
 
       @color = COLOR_SWITCH[@color]
@@ -105,7 +107,7 @@ class HumanPlayer
     message = "Tell that piece what to do"
     error_message = "Sorry, I don't understand. Try again"
     squares = prompt(message, error_message) do |input|
-      input.downcase.strip =~ /^([a-l][1-9][0-2]?)+$/
+      input.downcase.strip =~ /^([a-l][1-9][0-2]?,\s)*([a-l][1-9][0-2]?)$/
     end.downcase.strip
 
     squares.split(", ").map { |square| parse_square_input(square) }
@@ -135,6 +137,6 @@ class HumanPlayer
 end
 
 if __FILE__ == $PROGRAM_NAME
-  checkers = Checkers.new("Colin", "Loser", 8)
+  checkers = Checkers.new("Colin", "Other guy", 12)
   checkers.run
 end

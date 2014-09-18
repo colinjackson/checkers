@@ -3,7 +3,7 @@ end
 
 class Piece
   UP_SLIDES, DOWN_SLIDES = [[-1, -1], [-1, 1]], [[1, -1], [1, 1]]
-  ICONS = ['⨂', '⨷']
+  ICONS = ['✬', '✪']
 
   attr_reader :board, :color
   attr_accessor :square
@@ -18,7 +18,6 @@ class Piece
   def perform_moves(squares)
     raise InvalidMoveError unless valid_moves?(squares)
     perform_moves!(squares)
-    board.draw
   end
 
   def perform_moves!(squares)
@@ -31,6 +30,8 @@ class Piece
         raise InvalidMoveError
       end
     end
+
+    king_me! if !king? && back_row?
   end
 
   def perform_slide(to_square)
@@ -46,12 +47,14 @@ class Piece
     jumped = jumped_square(to_square)
     board[jumped] = nil
     update_position(to_square)
+    sleep 0.5
     true
   end
 
   def update_position(to_square)
     board[self.square] = nil
     board.add_piece(self, to_square)
+    board.draw
   end
 
   def slides
@@ -122,8 +125,13 @@ class Piece
     @king = true
   end
 
+  def back_row?
+    square[0] == (color == :black ? 0 : board.board_size - 1 )
+  end
+
   def icon
-    icon = king? ? ICONS[0] : ICON[1]
+    icon = king? ? ICONS[1] : ICONS[0]
+    color == :black ? icon : icon.red
   end
 
 end

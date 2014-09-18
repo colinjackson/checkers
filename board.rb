@@ -1,3 +1,4 @@
+require 'colorize'
 load './piece.rb'
 
 class Board
@@ -74,13 +75,68 @@ class Board
     end
   end
 
-  def draw
-    render = ""
-    rows.each do |row|
-      render += row.inject("") do |str, piece|
-        (el.nil? ? "   " : " * ")
+  def draw(selected = nil)
+    render = render_board(selected)
+    add_sides(render)
+    add_top_and_bottom(render)
+    add_padding(render)
+
+    system('clear')
+    print "\n" * 5
+    puts render
+  end
+
+  def render_board(selected)
+    render = []
+    board_size.times do |row_i|
+      row_render = ""
+
+      board_size.times do |col_i|
+        square = [row_i, col_i]
+        icon = self[square] ? self[square].icon : " "
+        next row_render += " #{icon} ".on_green if square == selected
+        row_render += (row_i + col_i).odd? ? " #{icon} " : " #{icon} ".on_white
       end
+      render << row_render
     end
+
+    render
+  end
+
+  def add_sides(render)
+    render.map!.with_index do |line, index|
+      row = board_size - index
+      row_str = row < 10 ? " #{row}" : "#{row}"
+      edge = " ║ "
+
+      "#{row_str}#{edge}#{line}#{edge.reverse}#{row_str}"
+    end
+  end
+
+  def add_top_and_bottom(render)
+    vertical = "═" * 3 * board_size
+    top_bound = "   ╔═" + vertical + "═╗   "
+    bottom_bound = "   ╚═" + vertical + "═╝   "
+    render.unshift(top_bound)
+    render.push(bottom_bound)
+
+    alpha_line = " " * 5
+    ('A'..'L').each_with_index do |letter, index|
+      next unless index < board_size
+      alpha_line += " #{letter} "
+    end
+    render.unshift(alpha_line)
+    render.push(alpha_line)
+  end
+
+  def add_padding(render)
+    win_width = `tput cols`.to_i
+    render_width = board_size * 3 + 10
+    return if render_width > win_width
+    padding_length = (win_width - render_width) / 2
+    padding = ' ' * padding_length
+
+    render.map! { |line| padding + line }
   end
 
   def over?
