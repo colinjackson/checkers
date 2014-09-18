@@ -28,6 +28,20 @@ class Board
     piece.square = square
   end
 
+  def dup
+    dup_board = Board.new(false, board_size)
+    dup_board.rows = self.rows.map do |row|
+      row.map do |piece|
+        next unless piece
+        new_piece = Piece.new(dup_board, piece.color, piece.square.dup)
+        new_piece.king_me! if piece.king?
+        new_piece
+      end
+    end
+
+    dup_board
+  end
+
   def add_pieces
     white_range, black_range = get_piece_ranges
 
@@ -59,4 +73,8 @@ class Board
       Piece.new(self, color, square)
     end
   end
+
+  protected
+  attr_writer :rows
+
 end

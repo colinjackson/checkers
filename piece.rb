@@ -1,8 +1,11 @@
+class InvalidMoveError < RuntimeError
+end
+
 class Piece
   UP_SLIDES, DOWN_SLIDES = [[-1, -1], [-1, 1]], [[1, -1], [1, 1]]
 
   attr_reader :board, :color
-  attr_writer :square
+  attr_accessor :square
 
   def initialize(board, color, square)
     @board, @color = board, color
@@ -11,15 +14,32 @@ class Piece
     @king = false
   end
 
+  def perform_moves(squares)
+    raise InvalidMoveError unless valid_moves?(squares)
+    perform_moves!(squares)
+  end
+
+  def perform_moves!(squares)
+    squares.each do |to_square|
+      if squares.count == 1 && reachable_squares(slides).include?(to_square)
+        perform_slide(to_square)
+      elsif reachable_squares(jumps).include?(to_square)
+        perform_jump(to_square)
+      else
+        raise InvalidMoveError
+      end
+    end
+  end
+
   def perform_slide(to_square)
-    return false unless valid_move?(to_square)
+    raise InvalidMoveError unless valid_move?(to_square)
 
     update_position(to_square)
     true
   end
 
   def perform_jump(to_square)
-    return false unless valid_move?(to_square)
+    return InvalidMoveError unless valid_move?(to_square)
 
     jumped = jumped_square(to_square)
     board[jumped] = nil
@@ -53,6 +73,18 @@ class Piece
       board[jumped] && board[jumped].color != self.color
     else
       false
+    end
+  end
+
+  def valid_moves?(squares)
+    test_board = board.dup
+    test_piece = test_board[self.square]
+    begin
+      test_piece.perform_moves!(squares)
+    rescue InvalidMoveError
+      false
+    else
+      true
     end
   end
 
