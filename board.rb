@@ -51,7 +51,7 @@ class Board
       next unless (row_i + col_i).odd?
 
       pos = [row_i, col_i]
-      self[pos] = (color.to_s)[0]
+      Piece.new(self, color, pos)
     end
   end
 end
