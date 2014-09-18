@@ -28,25 +28,30 @@ class Board
   end
 
   def add_pieces
-    color_piece_rows.each do |color, piece_rows|
-      piece_rows.each_with_index do |row, index|
-        offset = (index + (color == :black ? 0 : 1)) % 2
-        set_row(row, offset)
-      end
+    ranges = get_piece_ranges
+    white_range = ranges[0]
+
+    self.rows.each_with_index do |row, row_i|
+      next unless ranges.any? { |range| range.include?(row_i) }
+
+      color = white_range.include?(row_i) ? :white : :black
+      set_row(row, row_i, color)
     end
   end
 
-  def color_piece_rows
-    mid = rows.count / 2
-    top_rows = rows[0...(mid - 1)]
-    bottom_rows = rows[(mid + 1)...rows.count].reverse
-
-    { white: top_rows, black: bottom_rows }
+  def get_piece_ranges
+    board_mid = self.rows.count / 2
+    white_range = 0...(board_mid - 1)
+    black_range = (board_mid + 1)...rows.count
+    [white_range, black_range]
   end
 
-  def set_row(row, offset)
-    rows.count.times do |col|
-      row[col] = "PC" if (col + offset).even?
+  def set_row(row, row_i, color)
+    row.count.times do |col_i|
+      next unless (row_i + col_i).odd?
+
+      pos = [row_i, col_i]
+      self[pos] = (color.to_s)[0]
     end
   end
 end
