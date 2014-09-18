@@ -12,6 +12,21 @@ class Board
     add_pieces if set_pieces
   end
 
+  def [](pos)
+    row, col = pos
+    rows[row][col]
+  end
+
+  def []=(pos, value)
+    row, col = pos
+    rows[row][col] = value
+  end
+
+  def add_piece(piece, pos)
+    self[pos] = piece
+    piece.pos = pos
+  end
+
   def add_pieces
     color_piece_rows.each do |color, piece_rows|
       piece_rows.each_with_index do |row, index|
