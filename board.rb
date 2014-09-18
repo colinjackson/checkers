@@ -74,6 +74,19 @@ class Board
     end
   end
 
+  def over?
+    [:white, :black].any? { |color| won?(color) }
+  end
+
+  def won?(color)
+    other_color = color == :black ? :white : :black
+    lost?(other_color)
+  end
+
+  def lost?(color)
+    rows.flatten.compact.none? { |piece| piece.color == color }
+  end
+
   protected
   attr_writer :rows
 
