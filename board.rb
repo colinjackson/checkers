@@ -7,7 +7,7 @@ class Board
     Array.new(board_size) { Array.new(board_size) }
   end
 
-  def initialize(set_pieces = true, board_size = 8)
+  def initialize(board_size = 8, set_pieces = true)
     @board_size = board_size
     @rows = Board.make_rows(board_size)
     add_pieces if set_pieces
@@ -29,7 +29,7 @@ class Board
   end
 
   def dup
-    dup_board = Board.new(false, board_size)
+    dup_board = Board.new(board_size, false)
     dup_board.rows = self.rows.map do |row|
       row.map do |piece|
         next unless piece
@@ -74,8 +74,17 @@ class Board
     end
   end
 
+  def draw
+    render = ""
+    rows.each do |row|
+      render += row.inject("") do |str, piece|
+        (el.nil? ? "   " : " * ")
+      end
+    end
+  end
+
   def over?
-    [:white, :black].any? { |color| won?(color) }
+    [:white, :black].any? { |color| lost?(color) }
   end
 
   def won?(color)

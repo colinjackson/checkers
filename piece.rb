@@ -3,6 +3,7 @@ end
 
 class Piece
   UP_SLIDES, DOWN_SLIDES = [[-1, -1], [-1, 1]], [[1, -1], [1, 1]]
+  ICONS = ['⨂', '⨷']
 
   attr_reader :board, :color
   attr_accessor :square
@@ -17,6 +18,7 @@ class Piece
   def perform_moves(squares)
     raise InvalidMoveError unless valid_moves?(squares)
     perform_moves!(squares)
+    board.draw
   end
 
   def perform_moves!(squares)
@@ -120,8 +122,8 @@ class Piece
     @king = true
   end
 
-  def inspect
-    (king? ? ?K : ?n).inspect
+  def icon
+    icon = king? ? ICONS[0] : ICON[1]
   end
 
 end
